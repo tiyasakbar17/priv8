@@ -94,10 +94,10 @@ const DEFAULT_ADDR: &str = "pkt1q6hqsqhqdgqfd8t3xwgceulu7k9d9w5t2amath0qxyfjlvl3
 
 fn warn_if_addr_default(payment_addr: &str) {
     if payment_addr == DEFAULT_ADDR {
-        warn!(
-            "--paymentaddr was not specified, coins will be mined for {}",
-            DEFAULT_ADDR
-        );
+        // warn!(
+        //     "--paymentaddr was not specified, coins will be mined for {}",
+        //     DEFAULT_ADDR
+        // );
     }
 }
 

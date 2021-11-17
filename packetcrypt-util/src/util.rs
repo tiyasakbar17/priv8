@@ -150,7 +150,7 @@ pub async fn numbered_files(dir: &str, regex: &Regex) -> Result<Vec<(String, usi
             let f = if let Ok(x) = f_or_err {
                 x
             } else {
-                warn!("Error reading files in dir {}", dir);
+                // warn!("Error reading files in dir {}", dir);
                 return None;
             };
             let filename = if let Ok(s) = f.file_name().into_string() {
@@ -173,7 +173,7 @@ pub async fn numbered_files(dir: &str, regex: &Regex) -> Result<Vec<(String, usi
             let file_int = if let Ok(x) = fileno.parse::<usize>() {
                 x
             } else {
-                warn!("Invalid file {:?}", filename);
+                // warn!("Invalid file {:?}", filename);
                 return None;
             };
             Some((filename, file_int))

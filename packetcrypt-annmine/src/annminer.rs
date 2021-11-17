@@ -37,8 +37,8 @@ pub unsafe extern "C" fn on_ann_found(vctx: *mut c_void, ann: *mut u8) {
     };
     let dedup_hash = (&hash::compress32(&ann.bytes[..])[..]).get_u64_le();
     let ctx = vctx as *const CallbackCtx;
-    if let Err(e) = (*ctx).send_ann.send(AnnResult { ann, dedup_hash }) {
-        warn!("Unable to send announcement to channel because [{}]", e);
+    if let Err(_e) = (*ctx).send_ann.send(AnnResult { ann, dedup_hash }) {
+        // warn!("Unable to send announcement to channel because [{}]", e);
     }
 }
 

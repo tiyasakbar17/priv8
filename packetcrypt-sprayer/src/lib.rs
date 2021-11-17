@@ -272,7 +272,7 @@ impl Sprayer {
         let fd = raw_fd(&socket);
         let pkt_size = (cfg.mss / PKT_LENGTH) * PKT_LENGTH;
         if let Some(ref err) = gso_err {
-            warn!("UDP_GSO not supported {}, expect high CPU usage", err);
+            // warn!("UDP_GSO not supported {}, expect high CPU usage", err);
         } else {
             let res = unsafe { packetcrypt_sys::UdpGro_enable(fd, pkt_size as i32) };
             if res != 0 {
@@ -282,10 +282,10 @@ impl Sprayer {
 
         let res = unsafe { packetcrypt_sys::UdpGro_setRecvBuf(fd, RECV_BUF_SZ as i32) };
         if res != 0 {
-            warn!(
-                "Unable to set SO_RCVBUF to {}: {} - expect packet loss at high load",
-                RECV_BUF_SZ, res
-            );
+            // warn!(
+            //     "Unable to set SO_RCVBUF to {}: {} - expect packet loss at high load",
+            //     RECV_BUF_SZ, res
+            // );
         }
 
         let m = RwLock::new(SprayerMut {
@@ -428,10 +428,10 @@ impl Sprayer {
                 return;
             }
         }
-        warn!(
-            "Could not return chunk to peer {}, it seems they disappeared",
-            addr
-        );
+        // warn!(
+        //     "Could not return chunk to peer {}, it seems they disappeared",
+        //     addr
+        // );
     }
 
     fn send_subs(&self) -> Option<(std::io::Error, SocketAddr)> {
@@ -680,12 +680,12 @@ impl SprayWorker {
                 let count = uret / PKT_LENGTH;
                 if (count * PKT_LENGTH) != uret {
                     self.log(&|| {
-                        warn!(
-                            "Partial write to {}, only {} of {}",
-                            addr,
-                            uret,
-                            chunk.len() * PKT_LENGTH
-                        )
+                        // warn!(
+                        //     "Partial write to {}, only {} of {}",
+                        //     addr,
+                        //     uret,
+                        //     chunk.len() * PKT_LENGTH
+                        // )
                     });
                 }
                 chunk.bcur += count * PKT_LENGTH;
@@ -695,7 +695,8 @@ impl SprayWorker {
             }
         };
         if ret < 0 {
-            self.log(&|| warn!("Unable to send packet to {}, {}", addr, ret));
+            self.log(&|| info!(""));
+            // self.log(&|| warn!("Unable to send packet to {}, {}", addr, ret));
             return;
         }
     }
@@ -772,7 +773,8 @@ impl SprayWorker {
                         out = Some((fr, Vec::from(&buf[0..len])));
                         continue;
                     }
-                    self.log(&|| warn!("Got message (len {}) from unsubscribed node {}", len, fr));
+                    self.log(&|| info!(""));
+                    // self.log(&|| warn!("Got message (len {}) from unsubscribed node {}", len, fr));
                 }
                 Err(e) => {
                     if e.kind() != std::io::ErrorKind::WouldBlock {
@@ -848,10 +850,11 @@ impl SprayWorker {
             self.rchunk.ecur += len;
         } else {
             self.log(&|| {
-                warn!(
-                    "Got message from unsubscribed node {} (len: {})",
-                    address, len
-                )
+                info!("")
+                // warn!(
+                //     "Got message from unsubscribed node {} (len: {})",
+                //     address, len
+                // )
             });
         }
     }

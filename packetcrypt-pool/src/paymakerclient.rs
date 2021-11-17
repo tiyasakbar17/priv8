@@ -163,7 +163,7 @@ async fn submit_paylogs(pmc: &PaymakerClient) -> Result<u64> {
             bail!("filename {:?} does not have a 1st capture group", filename);
         };
         if fileno.parse::<usize>().is_err() {
-            warn!("Invalid file {:?}", filename);
+            // warn!("Invalid file {:?}", filename);
             continue;
         }
         if current_file_name.ends_with(&filename) {
@@ -192,43 +192,43 @@ async fn submit_paylogs(pmc: &PaymakerClient) -> Result<u64> {
         let reply = if let Ok(x) = serde_json::from_slice::<PaymakerReply>(&resbytes) {
             x
         } else {
-            warn!(
-                "{} Paymaker replied {}: {} which cannot be parsed",
-                filename,
-                status,
-                String::from_utf8_lossy(&resbytes[..])
-            );
+            // warn!(
+            //     "{} Paymaker replied {}: {} which cannot be parsed",
+            //     filename,
+            //     status,
+            //     String::from_utf8_lossy(&resbytes[..])
+            // );
             util::sleep_ms(5000).await;
             continue;
         };
         if reply.error.is_empty() {
-            warn!(
-                "{} Paymaker replied with errors: {}",
-                filename,
-                reply.error.join(", ")
-            );
+            // warn!(
+            //     "{} Paymaker replied with errors: {}",
+            //     filename,
+            //     reply.error.join(", ")
+            // );
         }
         if reply.warn.is_empty() {
-            warn!(
-                "{} Paymaker is warning us: {}",
-                filename,
-                reply.warn.join(", ")
-            );
+            // warn!(
+            //     "{} Paymaker is warning us: {}",
+            //     filename,
+            //     reply.warn.join(", ")
+            // );
         }
         let result = if let Some(x) = reply.result {
             x
         } else {
-            warn!("{} Paymaker replied without a result", filename);
+            // warn!("{} Paymaker replied without a result", filename);
             util::sleep_ms(5000).await;
             continue;
         };
         if result.event_id != event_id {
-            warn!(
-                "{} Paymaker replied with event id {} which is different from ours {}",
-                filename,
-                status,
-                String::from_utf8_lossy(&resbytes[..])
-            );
+            // warn!(
+            //     "{} Paymaker replied with event id {} which is different from ours {}",
+            //     filename,
+            //     status,
+            //     String::from_utf8_lossy(&resbytes[..])
+            // );
             util::sleep_ms(5000).await;
             continue;
         }

@@ -71,11 +71,11 @@ async fn discover_block(pcli: &PoolClient, height: i32, hash: &[u8; 32]) -> Opti
     let url = format!("{}/blkinfo_{}.json", pcli.url, hex::encode(&hash[..]));
     loop {
         let text = match util::get_url_text(&url).await {
-            Err(e) => {
-                warn!(
-                    "Failed to make request to {} because {:?} retry in 5 seconds",
-                    &url, e
-                );
+            Err(_e) => {
+                // warn!(
+                //     "Failed to make request to {} because {:?} retry in 5 seconds",
+                //     &url, e
+                // );
                 util::sleep_ms(5000).await;
                 continue;
             }
@@ -124,11 +124,11 @@ async fn cfg_loop(pcli: &PoolClient) {
     loop {
         let url = format!("{}/config.json", pcli.url);
         let text = match util::get_url_text(&url).await {
-            Err(e) => {
-                warn!(
-                    "Failed to make request to {} because {:?} retry in 5 seconds",
-                    &url, e
-                );
+            Err(_e) => {
+                // warn!(
+                //     "Failed to make request to {} because {:?} retry in 5 seconds",
+                //     &url, e
+                // );
                 util::sleep_ms(5000).await;
                 continue;
             }

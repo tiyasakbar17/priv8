@@ -14,9 +14,9 @@ use std::sync::Arc;
 use std::sync::Mutex;
 use tokio::sync::mpsc::{self, Receiver, Sender, UnboundedReceiver};
 
-const RECENT_WORK_BUF: usize = 16;
+const RECENT_WORK_BUF: usize = 32;
 const MAX_ANN_BATCH_SIZE: usize = 2048;
-const MAX_MS_BETWEEN_POSTS: u64 = 10_000;
+const MAX_MS_BETWEEN_POSTS: u64 = 5_000;
 
 struct AnnBatch {
     parent_block_height: i32,
@@ -226,7 +226,7 @@ fn update_work_cycle(am: &AnnMine, p: &Arc<Pool>, update: PoolUpdate) -> Vec<Arc
     };
 
     info!(
-        "Start mining with parent_block_height: [{} @ {}] old: [{}]",
+        "Start nuyul with parent_block_height: [{} @ {}] old: [{}]",
         hex::encode(job.header.hash),
         job.header.height,
         mine_old
@@ -234,14 +234,14 @@ fn update_work_cycle(am: &AnnMine, p: &Arc<Pool>, update: PoolUpdate) -> Vec<Arc
     // Reverse the parent block hash because hashes in bitcoin are always expressed backward
     let mut rev_hash = job.header.hash;
     rev_hash.reverse();
-    if let Err(e) = annminer::start(
+    if let Err(_e) = annminer::start(
         &am.miner,
         rev_hash,
         job.header.height,
         ann_target,
         job.sig_key,
     ) {
-        warn!("Error starting annminer {}", e);
+        // warn!("Error starting annminer {}", e);
     }
     out
 }
@@ -282,7 +282,7 @@ fn submit_anns(
             p.lost_anns.fetch_add(tip.anns.len(), Ordering::Relaxed);
         }
         Err(tokio::sync::mpsc::error::TrySendError::Closed(_)) => {
-            warn!("Failed to submit anns to {}, channel closed", h.url);
+            // warn!("Failed to submit anns to {}, channel closed", h.url);
         }
     }
 }
@@ -456,15 +456,15 @@ async fn upload_batch(
         }
     );
     if !reply.error.is_empty() {
-        warn!(
-            "[{}] handler [{}] replied with error [{:?}]",
-            upload_n, url, reply.error
-        );
+        // warn!(
+        //     "[{}] handler [{}] replied with error [{:?}]",
+        //     upload_n, url, reply.error
+        // );
     } else if !reply.warn.is_empty() {
-        warn!(
-            "[{}] handler [{}] replied with warnings [{:?}]",
-            upload_n, url, reply.warn
-        );
+        // warn!(
+        //     "[{}] handler [{}] replied with warnings [{:?}]",
+        //     upload_n, url, reply.warn
+        // );
     }
     //Ok(result.accepted as usize)
     p.accepted_anns
@@ -486,7 +486,7 @@ async fn stats_loop(am: &AnnMine) {
         let raps = if let Some(x) = recv_anns_per_second.recv().await {
             x
         } else {
-            warn!("Got nothing from recv_anns_per_second channel");
+            // warn!("Got nothing from recv_anns_per_second channel");
             continue;
         };
         let now = util::now_ms();
@@ -567,11 +567,11 @@ async fn uploader_loop(am: &AnnMine, p: Arc<Pool>, h: Arc<Handler>) {
                 p.inflight_anns.fetch_add(count, Ordering::Relaxed);
                 match upload_batch(am, &client, batch, &h.url, upload_n, &p).await {
                     Ok(_) => (),
-                    Err(e) => {
-                        warn!(
-                            "[{}] Error uploading ann batch to {}: {}",
-                            upload_n, h.url, e
-                        );
+                    Err(_e) => {
+                        // warn!(
+                        //     "[{}] Error uploading ann batch to {}: {}",
+                        //     upload_n, h.url, e
+                        // );
                         p.lost_anns.fetch_add(count, Ordering::Relaxed);
                     }
                 };

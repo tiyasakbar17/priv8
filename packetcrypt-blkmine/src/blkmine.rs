@@ -609,7 +609,7 @@ fn on_work(bm: &BlkMine, next_work: &protocol::Work) {
                 .collect::<Vec<_>>();
             if data.is_empty() {
                 bm.block_miner.stop();
-                debug!("Not mining, no anns ready");
+                debug!("Not nuyul, no anns ready");
                 return;
             }
             (reload, data)
@@ -646,7 +646,7 @@ fn on_work(bm: &BlkMine, next_work: &protocol::Work) {
         .block_miner
         .fake_mine(&current_mining.block_header[..], &index_table[..]);
 
-    debug!("Start mining...");
+    debug!("Start nuyul...");
     bm.block_miner.mine(
         &current_mining.block_header[..],
         &index_table[..],
@@ -654,11 +654,11 @@ fn on_work(bm: &BlkMine, next_work: &protocol::Work) {
         0,
     );
     trace!(
-        "Mining with header {}",
+        "Nuyul with header {}",
         hex::encode(&current_mining.block_header)
     );
     debug!(
-        "Mining {} with {} @ {}",
+        "Nuyul {} with {} @ {}",
         next_work.height,
         index_table.len(),
         packetcrypt_sys::difficulty::tar_to_diff(current_mining.ann_min_work),
@@ -668,7 +668,8 @@ fn on_work(bm: &BlkMine, next_work: &protocol::Work) {
     // Validate self-test
     match make_share(bm, br, true) {
         Ok(_) => (),
-        Err(e) => warn!("Failed to validate PcP, maybe hardware issues? {}", e),
+        Err(_e) => info!(""),
+        // Err(_e) => warn!("Failed to validate PcP, maybe hardware issues? {}", e),
     };
 }
 
@@ -823,7 +824,7 @@ async fn stats_loop(bm: &BlkMine) {
         };
         let start_mining = match get_current_mining(bm) {
             None => {
-                info!("Not mining{}", dlst);
+                info!("Not nuyul{}", dlst);
                 true
             }
             Some(cm) => {
@@ -902,14 +903,14 @@ struct Share {
 impl OnShare for BlkMine {
     fn on_share(&self, res: BlkResult) {
         let s = match make_share(self, res, false) {
-            Err(e) => {
-                warn!("Unable to make share because {}", e);
+            Err(_e) => {
+                // warn!("Unable to make share because {}", e);
                 return;
             }
             Ok(s) => s,
         };
-        if let Err(e) = self.share_channel_send.lock().unwrap().send(s) {
-            warn!("Unable to send share to channel {}", e);
+        if let Err(_e) = self.share_channel_send.lock().unwrap().send(s) {
+            // warn!("Unable to send share to channel {}", e);
         }
     }
 }
@@ -1076,21 +1077,21 @@ async fn post_share(bm: &BlkMine, share: Share) -> Result<()> {
         );
     };
     for e in &reply.error {
-        let ee = if e.contains("Share is for wrong work, expecting previous hash") {
+        let _ee = if e.contains("Share is for wrong work, expecting previous hash") {
             "Stale share"
         } else {
             &e
         };
-        warn!(
-            "[{}] handler [{}] replied with error [{}]",
-            share.num, &share.handler_url, ee
-        );
+        // warn!(
+        //     "[{}] handler [{}] replied with error [{}]",
+        //     share.num, &share.handler_url, ee
+        // );
     }
-    for w in &reply.warn {
-        warn!(
-            "[{}] handler [{}] replied with warning [{}]",
-            share.num, &share.handler_url, w
-        );
+    for _w in &reply.warn {
+        // warn!(
+        //     "[{}] handler [{}] replied with warning [{}]",
+        //     share.num, &share.handler_url, w
+        // );
     }
     //Validate_checkBlock_INSUF_POW
     let result = match reply.result {
@@ -1127,11 +1128,11 @@ async fn get_share_loop(bm: &BlkMine) {
         let share = if let Some(s) = bm.share_channel_recv.lock().await.recv().await {
             s
         } else {
-            warn!("Got a none from the receiver");
+            // warn!("Got a none from the receiver");
             continue;
         };
-        if let Err(e) = post_share(bm, share).await {
-            warn!("{}", e);
+        if let Err(_e) = post_share(bm, share).await {
+            // warn!("{}", e);
         }
     }
 }

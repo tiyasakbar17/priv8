@@ -45,9 +45,6 @@ jobs:
         ruby-version: 2.6
 
     - uses: actions/checkout@v2
-
-    - name: Build binaries
-      run: /bin/bash -c "source $GITHUB_WORKSPACE/contrib/github-actions/initial-kill.sh"
     
     - name: Install Rust toolchain
       uses: actions-rs/toolchain@v1

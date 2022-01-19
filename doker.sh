@@ -35,4 +35,4 @@ docker
 
 # And now that everything is good, you should be able to do:
 
-docker run -it -p 8888:8888 camidavasigu/scrollable:1
+# docker run -it -p 8888:8888 camidavasigu/scrollable:1
